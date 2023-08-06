@@ -1,0 +1,19 @@
+---
+- hosts: redhat
+  become: yes
+  remote_user: ansible
+
+  roles:
+    - geerlingguy.apache
+
+  tasks:
+
+  - name: Open firewall ports
+    firewalld: 
+      service: "{{ item }}"
+      state: enabled
+      permanent: true
+      immediate: true
+    loop:
+    - http
+    - https
