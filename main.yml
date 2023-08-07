@@ -1,12 +1,41 @@
 ---
-- hosts: redhat
+- name: Tareas Generales en Servidores Linux
+  hosts: linux
+  become: yes
+  remote_user: ansible
+
+  tasks:
+  - name: Update RedHat Servers
+    yum:
+      name: "*"
+      state: latest
+    notify: Restart
+    when: ansible_os_family == "RedHat"
+
+  - name: Update Debian Servers
+    apt:
+      name: "*"
+      state: latest
+      update_cache: yes
+    notify: Restart
+    when: ansible_os_family == "Debian"
+
+  handlers:
+  - name: Restart
+    reboot:
+
+- name: Configuracion de Servidores RedHad
+  hosts: redhat
   become: yes
   remote_user: ansible
 
   roles:
     - geerlingguy.apache
+    - container_tomcat
 
   tasks:
+  - name: Chequear autorized keys
+    include_tasks: authorized_key.yml
 
   - name: Open firewall ports
     firewalld: 
@@ -17,3 +46,13 @@
     loop:
     - http
     - https
+
+- name: Configuracion de Servidores Debian
+  hosts: debian
+  become: yes
+  remote_user: ansible
+
+  tasks:
+  - name: PRUEBA
+    reboot:
+    when: ansible_os_family == "Debian"
