@@ -1,2 +1,40 @@
 ---
 # tasks file for roles/container_tomcat
+- name: Crear directorio para todo.war
+  file:
+    path: /home/ansible/tomcat/webapps
+    state: directory
+
+- name: Crear directorio para app.properties
+  file:
+    path: /home/ansible/tomcat/config
+    state: directory
+
+- name: Copiar archivo de aplicación .war al host remoto
+  copy:
+    src: roles/container_tomcat/files/todo.war
+    dest: /home/ansible/tomcat/webapps
+
+- name: Copiar archivo de configuración al host remoto
+  copy:
+    src: roles/container_tomcat/files/app.properties
+    dest: /home/ansible/tomcat/config
+
+- name: Podman Install
+  yum:
+    name: podman
+    state: present
+
+- name: Crear contenedor de Tomcat
+  containers.podman.podman_container:
+    name: tomcat-container
+    image: docker.io/library/tomcat:9
+    state: started
+    ports:
+      - "8080:8080"
+    volumes:
+      - "/home/ansible/tomcat/webapps/todo.war:/usr/local/tomcat/webapps/todo.war:Z"
+      - "/home/ansible/tomcat/config/app.properties:/opt/config/app.properties:Z"
+    command:
+     - "catalina.sh"
+     - "run"
