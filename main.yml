@@ -34,8 +34,6 @@
     - container_tomcat
 
   tasks:
-  - name: Chequear autorized keys
-    include_tasks: authorized_key.yml
 
   - name: Open firewall ports
     firewalld: 
@@ -52,7 +50,6 @@
   become: yes
   remote_user: ansible
 
-  tasks:
-  - name: PRUEBA
-    reboot:
-    when: ansible_os_family == "Debian"
+  roles:
+    - mariadb_verdes
+    - create.database
