@@ -1,0 +1,29 @@
+---
+# tasks file for roles/create.database
+
+- name: Copiar archivo dump de la base de datos
+  copy:
+    src: roles/create.database/files/todo.sql
+    dest: /home/ansible/todo.sql
+
+
+- name: Restore database
+  community.mysql.mysql_db:
+    login_host: localhost
+    login_user: root
+    login_password: root
+    name: todo
+    state: import
+    target: /home/ansible/todo.sql
+
+- name: Creamos usuario todo
+  mysql_user:
+    login_host: localhost
+    login_user: root
+    login_password: root
+    name: todo
+    password: todo1234 
+#    encrypted: yes
+    priv: '*.*:ALL,GRANT'
+    state: present
+
