@@ -45,6 +45,30 @@
     - http
     - https
 
+  - name: Create virtualhost configuration directory
+    file:
+      path: /etc/httpd/vhosts.d
+      state: directory
+      owner: root
+
+  - name: Copy virtualhost configuration
+    copy:
+      src: roles/geerlingguy.apache/files/virtualhost.conf
+      dest: /etc/httpd/vhosts.d/ejemplo.conf
+    notify: Restart apache
+
+  - name: Include vhosts directory
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      line: IncludeOptional /etc/httpd/vhosts.d/*.conf
+
+  handlers:
+
+  - name: Restart apache
+    service:
+      name: httpd
+      state: restarted
+
 - name: Configuracion de Servidores Debian
   hosts: debian
   become: yes
